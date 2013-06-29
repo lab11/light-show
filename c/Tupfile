@@ -1,0 +1,4 @@
+
+!cc = |> gcc %f -Wall -O2 -lbcm2835 -o lights |> lights
+
+: *.c |> !cc |>
