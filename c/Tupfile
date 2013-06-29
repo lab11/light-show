@@ -1,4 +1,5 @@
 
-!cc = |> gcc %f -Wall -O2 -lbcm2835 -o lights |> lights
+!cc = |> gcc %f -Wall -O2 -lbcm2835 -o %o |>
 
-: *.c |> !cc |>
+: random.c |> !cc |> random
+: base.c tracer.c |> !cc |> tracer
