@@ -39,31 +39,80 @@
 
 #include <bcm2835.h>
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#define CLOCK RPI_GPIO_P1_10
-#define DATA  RPI_GPIO_P1_26
-#define LED0  RPI_GPIO_P1_07
-#define LED1  RPI_GPIO_P1_11
-#define LED2  RPI_GPIO_P1_13
+#define CLOCK RPI_V2_GPIO_P1_10
+#define DATA  RPI_V2_GPIO_P1_26
+#define LED0  RPI_V2_GPIO_P1_07
+#define LED1  RPI_V2_GPIO_P1_12
+#define LED2  RPI_V2_GPIO_P1_13
 
 
 #define STRIP_LENGTH 32 //32 LEDs on this strip
 long strip_colors[STRIP_LENGTH];
-/*
-void setup() {
-	pinMode(SDI, OUTPUT);
-	pinMode(CKI, OUTPUT);
-	pinMode(ledPin, OUTPUT);
 
-	//Clear out the array
-	for(int x = 0 ; x < STRIP_LENGTH ; x++)
-	strip_colors[x] = 0;
+struct timespec reset_time = {0, 500000};
 
-	randomSeed(analogRead(0));
 
-	//Serial.begin(9600);
-	//Serial.println("Hello!");
+
+// Throws random colors down the strip array
+void add_random(void) {
+	int i;
+	long new_color;
+
+	//First, shuffle all the current colors down one spot on the strip
+	for (i = (STRIP_LENGTH - 1); i>0; i--) {
+		strip_colors[i] = strip_colors[i - 1];
+	}
+
+	//Now form a new RGB color
+	new_color = 0;
+	for (i=0; i<3; i++) {
+		new_color <<= 8;
+		new_color |= (rand() % 0xFF) & 0xFF; //Give me a number from 0 to 0xFF
+	}
+
+	strip_colors[0] = new_color; //Add the new random color to the strip
 }
+
+
+//Takes the current strip color array and pushes it out
+void post_frame (void) {
+	//Each LED requires 24 bits of data
+	//MSB: R7, R6, R5..., G7, G6..., B7, B6... B0
+	//Once the 24 bits have been delivered, the IC immediately relays these bits to its neighbor
+	//Pulling the clock low for 500us or more causes the IC to post the data.
+
+	int led;
+	long color;
+	uint8_t color_bit;
+	long mask;
+
+	for (led=0; led<STRIP_LENGTH; led++) {
+		color = strip_colors[led]; //24 bits of color data
+
+		for (color_bit=0; color_bit<24; color_bit++) {
+			bcm2835_gpio_clr(CLOCK); //Only change data when clock is low
+
+			mask = 1L << color_bit;
+
+			if (color & mask) {
+				bcm2835_gpio_set(DATA);
+			} else {
+				bcm2835_gpio_clr(DATA);
+			}
+
+			bcm2835_gpio_set(CLOCK);
+		}
+	}
+
+	//Pull clock low to put strip into reset/post mode
+	bcm2835_gpio_clr(CLOCK);
+	nanosleep(&reset_time, NULL);
+}
+
 
 void loop() {
 	//Pre-fill the color array with known values
@@ -74,75 +123,18 @@ void loop() {
 	strip_colors[4] = 0x800000; //1/2 red (0x80 = 128 out of 256)
 	post_frame(); //Push the current color frame to the strip
 
-	delay(2000);
+	sleep(2);
 
-	while(1){ //Do nothing
-	addRandom();
-	post_frame(); //Push the current color frame to the strip
-
-	digitalWrite(ledPin, HIGH);   // set the LED on
-	delay(250);                  // wait for a second
-	digitalWrite(ledPin, LOW);    // set the LED off
-	delay(250);                  // wait for a second
+	while (1) {
+		add_random();
+		post_frame(); //Push the current color frame to the strip
+		sleep(1);
 	}
 }
 
-//Throws random colors down the strip array
-void addRandom(void) {
-	int x;
-
-	//First, shuffle all the current colors down one spot on the strip
-	for(x = (STRIP_LENGTH - 1) ; x > 0 ; x--)
-	strip_colors[x] = strip_colors[x - 1];
-
-	//Now form a new RGB color
-	long new_color = 0;
-	for(x = 0 ; x < 3 ; x++){
-	new_color <<= 8;
-	new_color |= random(0xFF); //Give me a number from 0 to 0xFF
-	//new_color &= 0xFFFFF0; //Force the random number to just the upper brightness levels. It sort of works.
-	}
-
-	strip_colors[0] = new_color; //Add the new random color to the strip
-}
-
-//Takes the current strip color array and pushes it out
-void post_frame (void) {
-	//Each LED requires 24 bits of data
-	//MSB: R7, R6, R5..., G7, G6..., B7, B6... B0
-	//Once the 24 bits have been delivered, the IC immediately relays these bits to its neighbor
-	//Pulling the clock low for 500us or more causes the IC to post the data.
-
-	for(int LED_number = 0 ; LED_number < STRIP_LENGTH ; LED_number++) {
-	long this_led_color = strip_colors[LED_number]; //24 bits of color data
-
-	for(byte color_bit = 23 ; color_bit != 255 ; color_bit--) {
-		//Feed color bit 23 first (red data MSB)
-
-		digitalWrite(CKI, LOW); //Only change data when clock is low
-
-		long mask = 1L << color_bit;
-		//The 1'L' forces the 1 to start as a 32 bit number, otherwise it defaults to 16-bit.
-
-		if(this_led_color & mask)
-		digitalWrite(SDI, HIGH);
-		else
-		digitalWrite(SDI, LOW);
-
-		digitalWrite(CKI, HIGH); //Data is latched when clock goes high
-	}
-	}
-
-	//Pull clock low to put strip into reset/post mode
-	digitalWrite(CKI, LOW);
-	delayMicroseconds(500); //Wait for 500us to go into reset
-}
-
-
-
-*/
 int main (int arc, char** argv) {
 	int err;
+	int i;
 
 	// Init the GPIO library
 	err = bcm2835_init();
@@ -158,11 +150,19 @@ int main (int arc, char** argv) {
 	bcm2835_gpio_fsel(LED1, BCM2835_GPIO_FSEL_OUTP);
 	bcm2835_gpio_fsel(LED2, BCM2835_GPIO_FSEL_OUTP);
 
-	bcm2835_gpio_set(LED0);
+	bcm2835_gpio_clr(LED0);
 	bcm2835_gpio_clr(LED1);
+	bcm2835_gpio_clr(LED2);
+
+	// Init the string
+	for(i=0; i<STRIP_LENGTH ; i++) {
+		strip_colors[i] = 0x0000FF;
+	}
+
+	// Do some random
+	srand(time(NULL));
+
+	loop();
 
 	return 0;
 }
-
-
-
