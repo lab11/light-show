@@ -9,7 +9,11 @@
 #define LED1  RPI_V2_GPIO_P1_12
 #define LED2  RPI_V2_GPIO_P1_13
 
-#define LIGHTS_BLUE 0x0000ff
+#define LIGHTS_BLUE 0x0000FF
+#define LIGHTS_YELLOW 0xFFFF00
+#define LIGHTS_GREEN 0x00FF00
+#define LIGHTS_RED 0xFF0000
+#define LIGHTS_PURPLE 0x7F00FF
 
 
 //Takes the current strip color array and pushes it out

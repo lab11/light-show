@@ -15,7 +15,6 @@
 
 #define INBUF_SIZE 16384
 
-
 // Setup a connection to the streaming server and return a socket to receive
 // packets on.
 int streamer_connect (char* query) {
@@ -23,13 +22,7 @@ int streamer_connect (char* query) {
 	struct addrinfo hints;
 	struct addrinfo *strmSvr;
 	int error;
-
 	ssize_t send_len;
-//	ssize_t recv_len;
-//	char inbuf[INBUF_SIZE];
-
-//	json_object* data;
-
 
 	// Tell getaddrinfo() that we only want a TCP connection
 	memset(&hints, 0, sizeof(hints));
@@ -87,4 +80,23 @@ int streamer_connect (char* query) {
 	}*/
 
 	return s;
+}
+
+// Call this function to receive a packet from the streamer.
+// Typically this is used with select so the packet is ready.
+json_object* streamer_receive (int socket) {
+	ssize_t recv_len;
+	json_object* data;
+
+	char inbuf[INBUF_SIZE];
+
+	recv_len = recv(socket, inbuf, INBUF_SIZE, 0);
+	if (recv_len <= 0) {
+		fprintf(stderr, "Receive failed.\n");
+		return NULL;
+	}
+
+	// Parse the returned JSON blob
+	data = json_tokener_parse(inbuf);
+	return data;
 }
