@@ -4,27 +4,26 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "base.h"
-
-long strip_colors[STRIP_LENGTH];
+#include "lights.h"
 
 struct timespec reset_time = {0, 500000};
 
 
 //Takes the current strip color array and pushes it out
-void set () {
+void lights_set (uint32_t* colors, uint16_t length) {
 	//Each LED requires 24 bits of data
 	//MSB: R7, R6, R5..., G7, G6..., B7, B6... B0
-	//Once the 24 bits have been delivered, the IC immediately relays these bits to its neighbor
+	//Once the 24 bits have been delivered, the IC immediately relays these
+	//bits to its neighbor
 	//Pulling the clock low for 500us or more causes the IC to post the data.
 
 	int led;
-	long color;
+	uint32_t color;
 	uint8_t color_bit;
-	long mask;
+	uint32_t mask;
 
-	for (led=0; led<STRIP_LENGTH; led++) {
-		color = strip_colors[led]; //24 bits of color data
+	for (led=0; led<length; led++) {
+		color = colors[led]; //24 bits of color data
 
 		for (color_bit=0; color_bit<24; color_bit++) {
 			bcm2835_gpio_clr(CLOCK); //Only change data when clock is low
@@ -46,9 +45,8 @@ void set () {
 	nanosleep(&reset_time, NULL);
 }
 
-int init () {
+int lights_init () {
 	int err;
-	int i;
 
 	// Init the GPIO library
 	err = bcm2835_init();
@@ -67,11 +65,6 @@ int init () {
 	bcm2835_gpio_clr(LED0);
 	bcm2835_gpio_clr(LED1);
 	bcm2835_gpio_clr(LED2);
-
-	// Init the string
-	for(i=0; i<STRIP_LENGTH ; i++) {
-		strip_colors[i] = 0x000000;
-	}
 
 	return 0;
 }

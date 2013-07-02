@@ -1,5 +1,7 @@
 
-!cc = |> gcc %f -Wall -O2 -lbcm2835 -o %o |>
+!cc = |> gcc %f -Wall -O2 -I/usr/local/include -lbcm2835 -o %o |>
 
 : random.c |> !cc |> random
-: base.c tracer.c |> !cc |> tracer
+: lights.c tracer.c stream_receiver.c |> !cc -ljson-c |> tracer
+
+.gitignore
