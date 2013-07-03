@@ -6,8 +6,6 @@
 
 #include "lights.h"
 
-#define DEBUG
-
 struct timespec reset_time = {0, 500000};
 
 

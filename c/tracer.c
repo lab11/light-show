@@ -17,7 +17,7 @@ char query[] = "{\"profile_id\":\"U8H29zqH0\",\"seq_no\":1}";
 
 struct timespec trace_gap_time = {0, 200000000};
 struct timespec fade_gap_time = {0, 20000000};
-struct timeval trace_gap_time_tv = {0, 200000};
+struct timeval trace_gap_time_tv = {0, 1000000};
 
 
 #define STRIP_LENGTH 32
@@ -106,15 +106,15 @@ void entry_update (int socket) {
 		// remote unlock
 		fade_to_white(LIGHTS_PURPLE);
 
-	} else if (strcmp(str, "udp_invalid")) {
+	} else if (strcmp(str, "udp_failed") == 0) {
 		// remove unlock with wrong password
 		fade_to_white(LIGHTS_RED);
 
-	} else if (strcmp(str, "rfid")) {
+	} else if (strcmp(str, "rfid") == 0) {
 		// someone swiped
 		fade_to_white(LIGHTS_BLUE);
 
-	} else if (strcmp(str, "rfid_invalid")) {
+	} else if (strcmp(str, "rfid_invalid") == 0) {
 		// invalid rfid card
 		fade_to_white(LIGHTS_RED);
 	}
@@ -135,12 +135,12 @@ int main (int argc, char** argv) {
 	// Connect to the streaming server
 	stream_socket = streamer_connect(query);
 
-
-
 	while (1) {
 		int ret;
 
 		// Setup the select call
+		trace_gap_time_tv.tv_sec = 0;
+		trace_gap_time_tv.tv_usec = 200000;
 		FD_ZERO(&rfds);
 		FD_SET(stream_socket, &rfds);
 		ret = select(stream_socket+1, &rfds, NULL, NULL, &trace_gap_time_tv);
@@ -149,11 +149,11 @@ int main (int argc, char** argv) {
 			// An error occurred with select
 			fprintf(stderr, "Select error.\n");
 			fprintf(stderr, "%s\n", strerror(errno));
-		
+
 		} else if (ret == 0) {
 			// select timeout
 			tracer_update();
-		
+
 		} else {
 			// File drescriptor ready
 			if (ret > 1) {

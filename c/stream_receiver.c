@@ -32,7 +32,10 @@ int streamer_connect (char* query) {
 	error = getaddrinfo(HOST, PORT, &hints, &strmSvr);
 	if (error) {
 		fprintf(stderr, "Could not resolve the host address: %s\n", HOST);
-		fprintf(stderr, "%s", gai_strerror(error));
+		fprintf(stderr, "%s\n", gai_strerror(error));
+		if (error == EAI_SYSTEM) {
+			fprintf(stderr, "%i: %s\n", errno, strerror(errno));
+		}
 		exit(1);
 	}
 
@@ -53,31 +56,13 @@ int streamer_connect (char* query) {
 	}
 
 	freeaddrinfo(strmSvr);
-       
+
 	// Send the query to the streamer server
 	send_len = send(s, query, strlen(query), 0);
 	if (send_len != strlen(query)) {
 		fprintf(stderr, "Did not send the entire query.\n");
 		fprintf(stderr, "Query len: %i, sent len: %i\n", (int) strlen(query), (int) send_len);
 	}
-/*
-	recv_len = recv(s, inbuf, INBUF_SIZE, 0);
-	if (recv_len <= 0) {
-		fprintf(stderr, "Receive failed.\n");
-		exit(1);
-	}
-
-	printf("%s\n", inbuf);
-
-	// Parse the returned JSON blob
-	data = json_tokener_parse(inbuf);
-
-	{
-		json_object* profile;
-		profile = json_object_object_get(data, "profile_id");
-		printf("profile: %s\n", json_object_get_string(profile));
-
-	}*/
 
 	return s;
 }
