@@ -55,39 +55,6 @@ void tracer_update () {
 }
 
 
-
-// Set the lights to a certain color and then fade to white
-void fade_to_white (uint32_t color) {
-	int i;
-	uint32_t r, g, b;
-
-	for (i=0; i<STRIP_LENGTH; i++) {
-		entrance_colors[i] = color;
-	}
-	lights_set(entrance_colors, STRIP_LENGTH);
-	nanosleep(&fade_gap_time, NULL);
-
-	while (1) {
-		r = (color >> 16) & 0xFF;
-		g = (color >> 8) & 0xFF;
-		b = color & 0xFF;
-
-		if (!r && !g && !b) break;
-
-		if (r) r--;
-		if (g) g--;
-		if (b) b--;
-
-		color = (r << 16) | (g << 8) | b;
-
-		for (i=0; i<STRIP_LENGTH; i++) {
-			entrance_colors[i] = color;
-		}
-		lights_set(entrance_colors, STRIP_LENGTH);
-		nanosleep(&fade_gap_time, NULL);
-	}
-}
-
 // Receive the data packet from the streamer and set the lights to a color
 // depending on who entered and how.
 void entry_update (int socket) {
@@ -105,10 +72,10 @@ void entry_update (int socket) {
 	type = json_object_object_get(d, "type");
 	if (!type) return;
 	str = json_object_get_string(type);
-	printf("%s\n", str);
+
 	if (strcmp(str, "udp") == 0) {
 		// remote unlock
-		fade_to_white(LIGHTS_PURPLE);
+		effects_fade(LIGHTS_PURPLE, LIGHTS_WHITE, STRIP_LENGTH);
 
 	} else if (strcmp(str, "udp_failed") == 0) {
 		// remove unlock with wrong password
@@ -116,11 +83,22 @@ void entry_update (int socket) {
 
 	} else if (strcmp(str, "rfid") == 0) {
 		// someone swiped
-		fade_to_white(LIGHTS_BLUE);
+		json_object* json_uniqname;
+		char* uniqname;
+
+		json_uniqname = json_object_object_get(d, "uniqname");
+		if (json_uniqname) {
+			uniqname = json_object_get_string(json_uniqname);
+			if (strcmp(uniqname, "bradjc") == 0) {
+				effects_fade(LIGHTS_BLUE, LIGHTS_WHITE, STRIP_LENGTH);
+			} else {
+				effects_fade(LIGHTS_GREEN, LIGHTS_WHITE, STRIP_LENGTH);
+			}
+		}
 
 	} else if (strcmp(str, "rfid_invalid") == 0) {
 		// invalid rfid card
-		fade_to_white(LIGHTS_RED);
+		effects_fade(LIGHTS_RED, LIGHTS_WHITE, STRIP_LENGTH);
 	}
 }
 
