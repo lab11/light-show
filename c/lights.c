@@ -3,10 +3,17 @@
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "lights.h"
 
 struct timespec reset_time = {0, 500000};
+
+int ledstrip_file;
 
 
 //Takes the current strip color array and pushes it out
@@ -17,9 +24,10 @@ void lights_set (uint32_t* colors, uint16_t length) {
 	//bits to its neighbor
 	//Pulling the clock low for 500us or more causes the IC to post the data.
 #ifndef DEBUG
-	int led;
+/*	int led;
 	uint32_t color;
-	uint8_t color_bit;
+	//uint8_t color_bit;
+	uint8_t color_byte;
 	uint32_t mask;
 
 	for (led=0; led<length; led++) {
@@ -38,11 +46,42 @@ void lights_set (uint32_t* colors, uint16_t length) {
 
 			bcm2835_gpio_set(CLOCK);
 		}
+
+		for (color_byte=0; color_byte<3; color_byte++) {
+			uint8_t cb = (color >> (color_byte*8)) & 0xFF;
+			bcm2835_spi_transfer(cb);
+		}
 	}
 
 	//Pull clock low to put strip into reset/post mode
 	bcm2835_gpio_clr(CLOCK);
 	nanosleep(&reset_time, NULL);
+*/
+
+	ssize_t result;
+	int i;
+	uint8_t* outbuf;
+
+	// Allocate a byte buffer long enough to hold the outgoing color values
+	outbuf = malloc(length*3);
+
+	for (i=0; i<length; i++) {
+		outbuf[i*3]     = (colors[i] >> 16) & 0xFF;
+		outbuf[(i*3)+1] = (colors[i] >> 8) & 0xFF;
+		outbuf[(i*3)+2] = colors[i] & 0xFF;
+	}
+
+	result = write(ledstrip_file, outbuf, length*3);
+	if (result == -1) {
+		fprintf(stderr, "Failed to write to ledstrip.\n");
+		fprintf(stderr, "%s\n", strerror(errno));
+	} else if (result != length*3) {
+		fprintf(stderr, "Only sent %i bytes to the led strip", result);
+		fprintf(stderr, " (intended to send %i).\n", length);
+		fprintf(stderr, "Did you not send a multiple of 3??\n");
+	}
+
+	free(outbuf);
 
 #else // Debug mode
 	int i;
@@ -73,8 +112,6 @@ int lights_init () {
 	}
 
 	// Init the relevant GPIO pins
-	bcm2835_gpio_fsel(CLOCK, BCM2835_GPIO_FSEL_OUTP);
-	bcm2835_gpio_fsel(DATA, BCM2835_GPIO_FSEL_OUTP);
 	bcm2835_gpio_fsel(LED0, BCM2835_GPIO_FSEL_OUTP);
 	bcm2835_gpio_fsel(LED1, BCM2835_GPIO_FSEL_OUTP);
 	bcm2835_gpio_fsel(LED2, BCM2835_GPIO_FSEL_OUTP);
@@ -83,8 +120,14 @@ int lights_init () {
 	bcm2835_gpio_clr(LED1);
 	bcm2835_gpio_clr(LED2);
 
-	return 0;
-#else
-	return 0;
+	ledstrip_file = open(LEDSTRIP_FILENAME, O_WRONLY, NULL);
+	if (ledstrip_file == -1) {
+		fprintf(stderr, "Could not open ledstrip file.\n");
+		fprintf(stderr, "%s\n", strerror(errno));
+		return 1;
+	}
+
 #endif
+
+	return 0;
 }

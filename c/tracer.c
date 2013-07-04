@@ -16,8 +16,8 @@
 char query[] = "{\"profile_id\":\"U8H29zqH0\",\"seq_no\":1}";
 
 struct timespec trace_gap_time = {0, 200000000};
-struct timespec fade_gap_time = {0, 20000000};
-struct timeval trace_gap_time_tv = {0, 1000000};
+struct timespec fade_gap_time =  {0, 20000000};
+struct timeval trace_gap_time_tv = {0, 200000};
 
 
 #define STRIP_LENGTH 32
@@ -56,7 +56,7 @@ void tracer_update () {
 // Set the lights to a certain color and then fade to white
 void fade_to_white (uint32_t color) {
 	int i;
-	uint8_t r, g, b;
+	uint32_t r, g, b;
 
 	for (i=0; i<STRIP_LENGTH; i++) {
 		entrance_colors[i] = color;
@@ -102,6 +102,7 @@ void entry_update (int socket) {
 	type = json_object_object_get(d, "type");
 	if (!type) return;
 	str = json_object_get_string(type);
+	printf("%s\n", str);
 	if (strcmp(str, "udp") == 0) {
 		// remote unlock
 		fade_to_white(LIGHTS_PURPLE);

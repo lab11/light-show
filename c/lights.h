@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#define CLOCK RPI_V2_GPIO_P1_10
-#define DATA  RPI_V2_GPIO_P1_26
+#define LEDSTRIP_FILENAME "/dev/ledstrip"
+
 #define LED0  RPI_V2_GPIO_P1_07
 #define LED1  RPI_V2_GPIO_P1_12
 #define LED2  RPI_V2_GPIO_P1_13
