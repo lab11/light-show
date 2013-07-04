@@ -10,6 +10,7 @@
 
 #include "lights.h"
 #include "stream_receiver.h"
+#include "effects.h"
 
 // Base query that wants a profile_id key and a seq_no key. When the tcp
 // streamer improves, this query can just query for the correct profile.
@@ -52,6 +53,8 @@ void tracer_update () {
 		}
 	}
 }
+
+
 
 // Set the lights to a certain color and then fade to white
 void fade_to_white (uint32_t color) {
@@ -109,7 +112,7 @@ void entry_update (int socket) {
 
 	} else if (strcmp(str, "udp_failed") == 0) {
 		// remove unlock with wrong password
-		fade_to_white(LIGHTS_RED);
+		effects_fade(LIGHTS_RED, LIGHTS_WHITE, STRIP_LENGTH);
 
 	} else if (strcmp(str, "rfid") == 0) {
 		// someone swiped
@@ -122,11 +125,15 @@ void entry_update (int socket) {
 }
 
 int main (int argc, char** argv) {
+	int result;
 	int i;
 	int stream_socket;
 	fd_set  rfds;
 
-	lights_init();
+	result = lights_init();
+	if (result != 0) {
+		return 1;
+	}
 
 	// Set all tracer lights blue
 	for (i=0; i<STRIP_LENGTH; i++) {

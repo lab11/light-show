@@ -103,44 +103,30 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 {
 	const unsigned char *buf = in_buf;
 
-	unsigned char cur_buf[3];
+	unsigned char b[3];
 	int out_len = 0;
 
-	uint32_t color;
-	int color_bit;
+	int byte, bit;
 
 	unsigned long result;
 
 	while (len >= 3) {
 
-		result = copy_from_user(cur_buf, buf, 3);
+		result = copy_from_user(b, buf, 3);
 		if (result != 0) {
 			// Could not copy from userspace
 			continue;
 		}
 
-		//unsigned int gpio_pin = XMAS_OUT_0;
-		//if (cur_buf[0] & 0x40) {
-		//	gpio_pin = XMAS_OUT_1;
-		//}
-
-		color = ((cur_buf[0] & 0xFF) << 16) |
-		        ((cur_buf[1] & 0xFF) << 8) |
-		        (cur_buf[2] & 0xFF);
-
 		local_irq_disable();
 
 		// Toggle the colors down the pin
-		for (color_bit=0; color_bit<24; color_bit++) {
-			gpio_set_value(LEDSTRIP_CLOCK, 0); //Only change data when clock is low
-
-			if (color & (1 << color_bit)) {
-				gpio_set_value(LEDSTRIP_DATA, 1);
-			} else {
-				gpio_set_value(LEDSTRIP_DATA, 0);
+		for (byte = 3; byte > 0; byte--) {
+			for (bit=8; bit>0; bit--) {
+				gpio_set_value(LEDSTRIP_CLOCK, 0);
+				gpio_set_value(LEDSTRIP_DATA, (b[byte-1]&(1<<(bit-1))) ? 1 : 0);
+				gpio_set_value(LEDSTRIP_CLOCK, 1);
 			}
-
-			gpio_set_value(LEDSTRIP_CLOCK, 1);
 		}
 
 		local_irq_enable();
@@ -152,7 +138,7 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 
 	// Pull clock low for 500us to put strip into reset/post mode
 	gpio_set_value(LEDSTRIP_CLOCK, 0);
-	udelay(500);
+	udelay(1000);
 
 	// This might result in some weird (read: broken) behavior
 	// if/when data is fragmented across multiple write calls

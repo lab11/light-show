@@ -14,6 +14,7 @@
 #define LIGHTS_GREEN 0x00FF00
 #define LIGHTS_RED 0xFF0000
 #define LIGHTS_PURPLE 0x7F00FF
+#define LIGHTS_WHITE 0xFFFFFF
 
 
 //Takes the current strip color array and pushes it out
