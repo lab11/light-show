@@ -61,7 +61,8 @@ int streamer_connect (char* query) {
 	send_len = send(s, query, strlen(query), 0);
 	if (send_len != strlen(query)) {
 		fprintf(stderr, "Did not send the entire query.\n");
-		fprintf(stderr, "Query len: %i, sent len: %i\n", (int) strlen(query), (int) send_len);
+		fprintf(stderr, "Query len: %i, sent len: %i\n", (int) strlen(query),
+			(int) send_len);
 	}
 
 	return s;

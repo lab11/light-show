@@ -12,9 +12,9 @@
 #include "stream_receiver.h"
 #include "effects.h"
 
-// Base query that wants a profile_id key and a seq_no key. When the tcp
-// streamer improves, this query can just query for the correct profile.
-char query[] = "{\"profile_id\":\"U8H29zqH0\",\"seq_no\":1}";
+// Base query that wants a specific profile_id, which is the data from the
+// door controller.
+char query[] = "{\"profile_id\":\"U8H29zqH0\"}";
 
 struct timespec trace_gap_time = {0, 200000000};
 struct timespec fade_gap_time =  {0, 20000000};
