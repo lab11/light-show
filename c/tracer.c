@@ -14,7 +14,7 @@
 
 // Base query that wants a specific profile_id, which is the data from the
 // door controller.
-char query[] = "{\"profile_id\":\"U8H29zqH0\"}";
+char query[] = "{\"profile_id\":\"U8H29zqH0i\"}";
 
 struct timespec trace_gap_time = {0, 200000000};
 struct timespec fade_gap_time =  {0, 20000000};
