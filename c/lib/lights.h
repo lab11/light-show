@@ -15,6 +15,9 @@
 #define LIGHTS_RED 0xFF0000
 #define LIGHTS_PURPLE 0x7F00FF
 #define LIGHTS_WHITE 0xFFFFFF
+#define LIGHTS_TEAL 0x008080
+#define LIGHTS_BLACK 0x000000
+#define LIGHTS_ORANGE 0xFFA500
 
 
 //Takes the current strip color array and pushes it out

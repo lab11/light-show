@@ -91,8 +91,15 @@ void entry_update (int socket) {
 			uniqname = json_object_get_string(json_uniqname);
 			if (strcmp(uniqname, "bradjc") == 0) {
 				effects_fade(LIGHTS_BLUE, LIGHTS_WHITE, STRIP_LENGTH);
+			} else if (strcmp(uniqname, "nklugman") == 0) {
+				effects_blink(LIGHTS_WHITE, LIGHTS_PURPLE, STRIP_LENGTH);
+			} else if (strcmp(uniqname, "wwhuang") == 0) {
+				effects_fade(LIGHTS_TEAL, LIGHTS_RED, STRIP_LENGTH);
+			} else if (strcmp(uniqname, "zakir") == 0) {
+				effects_grow(LIGHTS_ORANGE, STRIP_LENGTH);
 			} else {
-				effects_fade(LIGHTS_GREEN, LIGHTS_WHITE, STRIP_LENGTH);
+		//		effects_fade(LIGHTS_GREEN, LIGHTS_WHITE, STRIP_LENGTH);
+				effects_grow(LIGHTS_RED, STRIP_LENGTH);
 			}
 		}
 
