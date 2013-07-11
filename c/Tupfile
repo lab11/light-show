@@ -1,7 +1,6 @@
-
-!cc = |> @(GCC) %f -Wall -O2 -I/usr/local/include -lbcm2835 @(CFLAGS) -o %o |>
+include global.tup
 
 : random.c |> !cc |> random
-: lights.c tracer.c stream_receiver.c effects.c |> !cc -ljson-c |> tracer
+: tracer.c | <objs> |> !cc %<objs> -ljson-c |> tracer
 
 .gitignore

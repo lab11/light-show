@@ -1,0 +1,1 @@
+!cc = |> @(GCC) %f -Wall -O2 -I/usr/local/include -Ilib -lbcm2835 @(CFLAGS) -o %o |>
