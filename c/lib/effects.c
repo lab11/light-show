@@ -13,7 +13,7 @@
 
 struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
-struct timespec grow_time = {0, 100000000};
+struct timespec grow_time = {1, 0};
 
 void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights) {
 	uint32_t* l;
@@ -40,7 +40,7 @@ void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights
 void effects_blink (uint32_t color1, uint32_t color2, uint16_t num_lights) {
 	uint32_t* l;
 	uint16_t i, j;
-	uint8_t num_steps = 100;
+	uint8_t num_steps = 25;
 
 	l = malloc(sizeof(uint32_t) * num_lights);
 
@@ -69,7 +69,6 @@ void effects_grow (uint32_t color, uint16_t num_lights) {
 	for (i=0; i<num_blocks; i++) {
 		uint32_t c = _effects_interpolate_color(color, LIGHTS_WHITE, i, num_blocks);
 		for (j=(i*8); j<((i+1)*8); j++) {
-			printf("%i\n", j);
 			l[j] = c;
 		}
 		lights_set(l, num_lights);
