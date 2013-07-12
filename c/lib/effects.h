@@ -14,7 +14,10 @@ uint8_t _effects_interpolate (uint8_t hue_start,
                               uint8_t step_idx,
                               uint8_t num_steps);
 
-
+uint32_t _effects_interpolate_color (uint32_t color_start,
+                                     uint32_t color_end,
+                                     uint8_t step_idx,
+                                     uint8_t num_steps);
 
 
 #endif
