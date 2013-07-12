@@ -1,6 +1,6 @@
 include global.tup
 
 : random.c |> !cc |> random
-: tracer.c | <objs> |> !cc %<objs> -ljson-c |> tracer
+: tracer.c | <objs> |> !cc %<objs> -ljson-c -lbcm2835 |> tracer
 
 .gitignore
