@@ -99,6 +99,7 @@ void entry_update (int socket) {
 				effects_grow(LIGHTS_ORANGE, STRIP_LENGTH);
 			} else {
 		//		effects_fade(LIGHTS_GREEN, LIGHTS_WHITE, STRIP_LENGTH);
+				printf("%s\n", uniqname);
 				effects_grow(LIGHTS_RED, STRIP_LENGTH);
 			}
 		}

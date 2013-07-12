@@ -18,27 +18,13 @@ struct timespec grow_time = {0, 100000000};
 void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights) {
 	uint32_t* l;
 	uint32_t color;
-	uint8_t r, g, b;
-	uint8_t rs, gs, bs;
-	uint8_t re, ge, be;
 	uint8_t num_steps = 100;
 	uint16_t i, j;
 
 	l = malloc(sizeof(uint32_t) * num_lights);
 
-	rs = GETRED(start_color);
-	gs = GETGREEN(start_color);
-	bs = GETBLUE(start_color);
-	re = GETRED(end_color);
-	ge = GETGREEN(end_color);
-	be = GETBLUE(end_color);
-
 	for (i=0; i<=num_steps; i++) {
-		r = _effects_interpolate(rs, re, i, num_steps);
-		g = _effects_interpolate(gs, ge, i, num_steps);
-		b = _effects_interpolate(bs, be, i, num_steps);
-
-		color = MAKECOLOR(r, g, b);
+		color = _effects_interpolate_color(start_color, end_color, i, num_steps);
 
 		for (j=0; j<num_lights; j++) {
 			l[j] = color;
@@ -81,9 +67,10 @@ void effects_grow (uint32_t color, uint16_t num_lights) {
 	}
 
 	for (i=0; i<num_blocks; i++) {
-		uint32_t color = _effects_interpolate(color, LIGHTS_WHITE, i, num_blocks);
-		for (j=(i*8); j++; j<((i+1)*8)) {
-			l[j] = color;
+		uint32_t c = _effects_interpolate_color(color, LIGHTS_WHITE, i, num_blocks);
+		for (j=(i*8); j<((i+1)*8); j++) {
+			printf("%i\n", j);
+			l[j] = c;
 		}
 		lights_set(l, num_lights);
 		nanosleep(&grow_time, NULL);
@@ -111,3 +98,24 @@ uint8_t _effects_interpolate (uint8_t hue_start,
 	}
 }
 
+uint32_t _effects_interpolate_color (uint32_t color_start,
+                                     uint32_t color_end,
+                                     uint8_t step_idx,
+                                     uint8_t num_steps) {
+	uint8_t rs, gs, bs;
+	uint8_t re, ge, be;
+	uint8_t r, g, b;
+
+	rs = GETRED(color_start);
+	gs = GETGREEN(color_start);
+	bs = GETBLUE(color_start);
+	re = GETRED(color_end);
+	ge = GETGREEN(color_end);
+	be = GETBLUE(color_end);
+
+	r = _effects_interpolate(rs, re, step_idx, num_steps);
+	g = _effects_interpolate(gs, ge, step_idx, num_steps);
+	b = _effects_interpolate(bs, be, step_idx, num_steps);
+
+	return MAKECOLOR(r, g, b);
+}
