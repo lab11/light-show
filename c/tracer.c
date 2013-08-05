@@ -21,7 +21,7 @@ struct timespec fade_gap_time =  {0, 20000000};
 struct timeval trace_gap_time_tv = {0, 200000};
 
 
-#define STRIP_LENGTH 32
+#define STRIP_LENGTH 351
 uint32_t tracer_colors[STRIP_LENGTH];
 uint32_t entrance_colors[STRIP_LENGTH];
 
@@ -33,7 +33,8 @@ void tracer_update () {
 
 	// Set all blue
 	for (i=0; i<STRIP_LENGTH; i++) {
-		tracer_colors[i] = LIGHTS_BLUE;
+		tracer_colors[i] = LIGHTS_BLACK;
+		//tracer_colors[i] = LIGHTS_WHITE;
 	}
 	// Set the tracer to yellow
 	tracer_colors[dot] = LIGHTS_YELLOW;
