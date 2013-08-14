@@ -10,8 +10,8 @@
 static ssize_t ledstrip_write(struct file *, const char *, size_t, loff_t *);
 
 #define DEVICE_NAME "ledstrip"
-#define LEDSTRIP_CLOCK 15
-#define LEDSTRIP_DATA 7
+#define LEDSTRIP_CLOCK 30
+#define LEDSTRIP_DATA 31
 
 static unsigned int major;
 static dev_t char_d_mm;
@@ -27,6 +27,15 @@ struct file_operations ledstrip_fops = {
 	.release = NULL
 };
 
+#define ACTIVE_LOW
+
+#ifdef ACTIVE_LOW
+#define ONE 0
+#define ZERO 1
+#else
+#define ONE 1
+#define ZERO 0
+#endif
 
 int init_module()
 {
@@ -110,6 +119,8 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 
 	unsigned long result;
 
+	local_irq_disable();
+
 	while (len >= 3) {
 
 		result = copy_from_user(b, buf, 3);
@@ -118,27 +129,33 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 			continue;
 		}
 
-		local_irq_disable();
-
 		// Toggle the colors down the pin
 		for (byte = 3; byte > 0; byte--) {
 			for (bit=8; bit>0; bit--) {
-				gpio_set_value(LEDSTRIP_CLOCK, 0);
-				gpio_set_value(LEDSTRIP_DATA, (b[byte-1]&(1<<(bit-1))) ? 1 : 0);
-				gpio_set_value(LEDSTRIP_CLOCK, 1);
+				gpio_set_value(LEDSTRIP_CLOCK, ZERO);
+				gpio_set_value(LEDSTRIP_DATA, (b[byte-1]&(1<<(bit-1))) ? ONE : ZERO);
+				udelay(5);
+				gpio_set_value(LEDSTRIP_CLOCK, ONE);
+				udelay(5);
+
 			}
 		}
 
-		local_irq_enable();
 
 		buf += 3;
 		len -= 3;
 		out_len += 3;
+
+		udelay(10);
 	}
 
+	udelay(50);
 	// Pull clock low for 500us to put strip into reset/post mode
-	gpio_set_value(LEDSTRIP_CLOCK, 0);
+	gpio_set_value(LEDSTRIP_CLOCK, ZERO);
 	udelay(1000);
+	gpio_set_value(LEDSTRIP_CLOCK, ONE);
+
+	local_irq_enable();
 
 	// This might result in some weird (read: broken) behavior
 	// if/when data is fragmented across multiple write calls
@@ -153,3 +170,4 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 MODULE_AUTHOR("Brad Campbell");
 MODULE_DESCRIPTION("Kernel module to drive the Sparkfun LED Strip.");
 MODULE_LICENSE("GPL");
+MODULE_VERSION("1.1");
