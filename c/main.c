@@ -85,7 +85,8 @@ int main (int argc, char** argv) {
 	// This is dependent on the period it requested when it registered.
 	int app_periods = 0;
 
-	struct timeval* select_timeout;
+	struct timeval* select_timeout_ptr;
+	struct timeval select_timeout;
 	int max_socket;
 	fd_set rfds;
 
@@ -136,9 +137,10 @@ int main (int argc, char** argv) {
 
 		if (current_app == -1) {
 			// no timeout
-			select_timeout = NULL;
+			select_timeout_ptr = NULL;
 		} else {
-			select_timeout = &info[current_app].period;
+			select_timeout = info[current_app].period;
+			select_timeout_ptr = &select_timeout;
 		}
 
 		// Setup the select call
@@ -152,7 +154,7 @@ int main (int argc, char** argv) {
 				}
 			}
 		}
-		ret = select(max_socket+1, &rfds, NULL, NULL, select_timeout);
+		ret = select(max_socket+1, &rfds, NULL, NULL, select_timeout_ptr);
 
 		if (ret == -1) {
 			// An error occurred with select
