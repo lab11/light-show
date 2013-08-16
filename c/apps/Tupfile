@@ -1,0 +1,3 @@
+include ../global.tup
+
+: foreach *.c |> !cc -c -I../ -I../lib |> %B.o | ../<objs>
