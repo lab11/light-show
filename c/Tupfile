@@ -1,7 +1,5 @@
 include global.tup
 
-: random.c               |> !cc                            |> random
-: whitebright.c | <objs> |> !cc %<objs> -ljson-c -lbcm2835 |> wb
-: tracer.c      | <objs> |> !cc %<objs> -ljson-c -lbcm2835 |> tracer
+: main.c | <objs> |> !cc %<objs> -Iapps -ljson-c -lbcm2835 |> lightshow
 
 .gitignore
