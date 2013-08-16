@@ -10,7 +10,7 @@
 
 #include "lights.h"
 
-struct timespec sleep_time = {10, 0};
+struct timespec sleep_time = {3, 0};
 
 
 #define STRIP_LENGTH 350
@@ -30,6 +30,9 @@ int main (int argc, char** argv) {
 	for (i=0; i<STRIP_LENGTH; i++) {
 		c[i] = LIGHTS_BLACK;
 	}
+	lights_set(c, STRIP_LENGTH);
+	
+	nanosleep(&sleep_time, NULL);
 
 	for (i=0; i<35; i++) {
 		for (j=i; j<350; j+=35) {
