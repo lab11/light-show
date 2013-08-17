@@ -18,6 +18,8 @@
 #define LIGHTS_TEAL 0x008080
 #define LIGHTS_BLACK 0x000000
 #define LIGHTS_ORANGE 0xFFA500
+#define LIGHTS_MINT 0x9BEBA2
+#define LIGHTS_WINTER_LAKE 0x7386BA
 
 
 //Takes the current strip color array and pushes it out

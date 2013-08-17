@@ -9,6 +9,7 @@
 
 #include "main.h"
 #include "lights.h"
+#include "effects.h"
 #include "app.h"
 
 #define NUMBER_APPS sizeof(init_fns) / sizeof(init_fn*)
@@ -91,6 +92,7 @@ int main (int argc, char** argv) {
 	fd_set rfds;
 
 	lights_init();
+	effects_init();
 
 	// Set all lights off
 	for (i=0; i<STRIP_LENGTH; i++) {

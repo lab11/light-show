@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 
 #include "lights.h"
 #include "effects.h"
@@ -14,6 +15,13 @@
 struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
+struct timespec pong_time = {0, 100000000};
+
+int effects_init () {
+	srand(time(NULL));
+
+	return 0;
+}
 
 void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights) {
 	uint32_t* l;
@@ -74,7 +82,71 @@ void effects_grow (uint32_t color, uint16_t num_lights) {
 		lights_set(l, num_lights);
 		nanosleep(&grow_time, NULL);
 	}
-	
+
+	free(l);
+}
+
+void effects_pong (uint32_t paddle_color, uint32_t back_color, int num_lights) {
+	uint32_t* l;
+	uint16_t i, j;
+	uint16_t paddle_size = num_lights / 12;
+	uint16_t head, tail;
+	uint8_t direction = 1;
+
+	l = malloc(sizeof(uint32_t) * num_lights);
+
+	head = 0;
+	tail = paddle_size;
+
+	for (i=0; i<200; i++) {
+		for (j=0; j<num_lights; j++) {
+			l[j] = back_color;
+		}
+
+		for (j=head; j<tail; j++) {
+			l[j] = paddle_color;
+		}
+		lights_set(l, num_lights);
+
+		// check if we're at an end
+		if (head == 0) {
+			head++;
+			tail++;
+			direction = 1;
+		} else if (tail = num_lights-1) {
+			head--;
+			tail--;
+			direction = 0;
+		} else {
+			// pick a direction at random
+			int r = rand() % 100;
+			if (r > 75) {
+				// reverse
+				if (direction == 1) {
+					head--;
+					tail--;
+					direction = 0;
+				} else {
+					head++;
+					tail++;
+					direction = 1;
+				}
+			} else {
+				// keep on truckin
+				if (direction == 1) {
+					head++;
+					tail++;
+				} else {
+					head--;
+					tail--;
+				}
+			}
+
+		}
+
+		nanosleep(&pong_time, NULL);
+	}
+
 	free(l);
 }
 

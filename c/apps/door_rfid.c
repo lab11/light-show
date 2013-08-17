@@ -7,12 +7,20 @@
 #include "stream_receiver.h"
 #include "effects.h"
 #include "lights.h"
+#include "door_rfid.h"
+#include "people.h"
 
 int stream_socket;
 
 // Base query that wants a specific profile_id, which is the data from the
 // door controller.
 char query[] = "{\"profile_id\":\"U8H29zqH0i\"}";
+
+#define NUMBER_PEOPLE sizeof(uniqname_actions) / sizeof(rfid_action_t)
+rfid_action_t uniqname_actions[] = {{"bradjc", bradjc_enter},
+                                    {"nklugman", nklugman_enter},
+                                    {"wwhuang", wwhuang_enter},
+                                    {"zakir", zakir_enter}};
 
 int door_rfid_init () {
 	stream_socket = streamer_connect(query);
@@ -55,17 +63,16 @@ void door_rfid_update (uint32_t* lights, int len) {
 
 		json_uniqname = json_object_object_get(d, "uniqname");
 		if (json_uniqname) {
+			uint8_t match = 0;
+			int i;
 			uniqname = json_object_get_string(json_uniqname);
-			if (strcmp(uniqname, "bradjc") == 0) {
-				//effects_fade(LIGHTS_BLUE, LIGHTS_WHITE, len);
-				effects_grow(LIGHTS_BLUE, len);
-			} else if (strcmp(uniqname, "nklugman") == 0) {
-				effects_blink(LIGHTS_WHITE, LIGHTS_PURPLE, len);
-			} else if (strcmp(uniqname, "wwhuang") == 0) {
-				effects_fade(LIGHTS_TEAL, LIGHTS_RED, len);
-			} else if (strcmp(uniqname, "zakir") == 0) {
-				effects_grow(LIGHTS_ORANGE, len);
-			} else {
+			for (i=0; i<NUMBER_PEOPLE; i++) {
+				if (strcmp(uniqname, uniqname_actions[i].uniqname) == 0) {
+					uniqname_actions[i].enter_fn(len);
+					match = 1;
+				}
+			}
+			if (!match) {
 				effects_grow(LIGHTS_RED, len);
 			}
 		}
