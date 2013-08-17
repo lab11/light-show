@@ -3,5 +3,5 @@
 #include "effects.h"
 
 void bradjc_enter (int len) {
-	effects_pong(LIGHTS_WINTER_LAKE, LIGHTS_MINT, len);
+	effects_pong(LIGHTS_MINT, LIGHTS_BLACK, len);
 }

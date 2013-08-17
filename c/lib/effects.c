@@ -15,7 +15,7 @@
 struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
-struct timespec pong_time = {0, 100000000};
+struct timespec pong_time = {0, 50000000};
 
 int effects_init () {
 	srand(time(NULL));
@@ -95,8 +95,8 @@ void effects_pong (uint32_t paddle_color, uint32_t back_color, int num_lights) {
 
 	l = malloc(sizeof(uint32_t) * num_lights);
 
-	head = 0;
-	tail = paddle_size;
+	head = num_lights / 2;
+	tail = head + paddle_size;
 
 	for (i=0; i<200; i++) {
 		for (j=0; j<num_lights; j++) {
@@ -113,14 +113,14 @@ void effects_pong (uint32_t paddle_color, uint32_t back_color, int num_lights) {
 			head++;
 			tail++;
 			direction = 1;
-		} else if (tail = num_lights-1) {
+		} else if (tail == num_lights-1) {
 			head--;
 			tail--;
 			direction = 0;
 		} else {
 			// pick a direction at random
 			int r = rand() % 100;
-			if (r > 75) {
+			if (r > 92) {
 				// reverse
 				if (direction == 1) {
 					head--;
