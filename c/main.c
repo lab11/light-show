@@ -12,7 +12,7 @@
 #include "effects.h"
 #include "app.h"
 
-#define NUMBER_APPS sizeof(init_fns) / sizeof(init_fn*)
+#define NUMBER_APPS (sizeof(init_fns) / sizeof(init_fn*))
 #define APP_DURATION 60  // time in seconds
 
 init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init};
