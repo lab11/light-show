@@ -15,7 +15,7 @@
 struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
-struct timespec pong_time = {0, 500000};
+struct timespec pong_time = {0, 1000000};
 
 int effects_init () {
 	srand(time(NULL));
