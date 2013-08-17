@@ -10,4 +10,7 @@ void door_rfid_update (uint32_t* lights, int len);
 int random_init ();
 void random_update (uint32_t* lights, int len);
 
+int cube_init ();
+void cube_update (uint32_t* lights, int len);
+
 #endif

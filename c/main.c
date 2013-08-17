@@ -15,8 +15,8 @@
 #define NUMBER_APPS (sizeof(init_fns) / sizeof(init_fn*))
 #define APP_DURATION 60  // time in seconds
 
-init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init};
-const char* init_names[] = {"tracer", "door rfid", "random"};
+init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init, cube_init};
+const char* init_names[] = {"tracer", "door rfid", "random", "cube"};
 app_info    info[NUMBER_APPS] = {{CONTINUOUS_APP,
                                   -1,
                                   NULL,
