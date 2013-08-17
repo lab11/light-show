@@ -7,4 +7,7 @@ void tracer_update (uint32_t* lights, int len);
 int door_rfid_init ();
 void door_rfid_update (uint32_t* lights, int len);
 
+int random_init ();
+void random_update (uint32_t* lights, int len);
+
 #endif
