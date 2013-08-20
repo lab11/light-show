@@ -12,8 +12,7 @@
 #define GETBLUE(x) (x&0xFF)
 #define MAKECOLOR(r,g,b) (((r&0xFF)<<16)|((g&0xFF)<<8)|(b&0xFF))
 
-struct timespec fade_time_slow = {0, 100000000};
-struct timespec fade_time_fast = {0, 1000000};
+struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
 struct timespec pong_time = {0, 1000000};
@@ -27,13 +26,13 @@ int effects_init () {
 void effects_fade_slow (uint32_t start_color,
                         uint32_t end_color,
                         uint16_t num_lights) {
-	effects_fade(start_color, end_color, num_lights, 100, &fade_time_slow);
+	effects_fade(start_color, end_color, num_lights, 100, &fade_time);
 }
 
 void effects_fade_fast (uint32_t start_color,
                         uint32_t end_color,
                         uint16_t num_lights) {
-	effects_fade(start_color, end_color, num_lights, 10, &fade_time_fast);
+	effects_fade(start_color, end_color, num_lights, 10, &fade_time);
 }
 
 void effects_fade (uint32_t start_color,
