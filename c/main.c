@@ -16,7 +16,10 @@
 #define APP_DURATION 60  // time in seconds
 #define NUMBER_INITS (sizeof(init_fns) / sizeof(init_fn*))
 
-init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init, cube_init,
+init_fn*    init_fns[]   = {tracer_init,
+                            door_rfid_init,
+                            random_init,
+                            cube_init,
                             coilcube_init};
 const char* init_names[] = {"tracer", "door rfid", "random", "cube",
                             "coilcube"};
@@ -83,7 +86,7 @@ int register_continuous (struct timeval tv, update_fn* u) {
 	return 0;
 }
 
-int main (int argc, char** argv) {
+int main () {
 	int result;
 	int i;
 

@@ -17,7 +17,7 @@
 int cc_socket;
 char ccquery[] = "{\"profile_id\":\"7aiOPJapXF\", \"type\":\"coilcube_watts\"}";
 
-uint64_t then = 0;
+time_t then = 0;
 
 int coilcube_init () {
 	struct timeval period = {0, 100000};
@@ -33,12 +33,12 @@ int coilcube_init () {
 // Update the colors for the simple tracer application
 void coilcube_timeslot (uint32_t* lights, int len) {
 	struct timeval thentime;
-	uint64_t now;
+	time_t now;
 
 	gettimeofday(&thentime, NULL);
-	now = thentime.tv_sec + (1000000 * thentime.tv_usec);
+	now = thentime.tv_sec;
 
-	if (now - then > 500000) {
+	if (now - then >= 1) {
 		// If it is the start of our turn turn the lights off
 		lights_off(len);
 	}
@@ -48,7 +48,7 @@ void coilcube_timeslot (uint32_t* lights, int len) {
 
 // Called when an incoming packet happens
 void coilcube_pkt (uint32_t* lights, int len) {
-	uint64_t now;
+	time_t now;
 	struct timeval nowtime;
 	json_object* pkt;
 	json_object* type;
@@ -59,8 +59,8 @@ void coilcube_pkt (uint32_t* lights, int len) {
 
 	// Check that it is still our time to update the lights
 	gettimeofday(&nowtime, NULL);
-	now = nowtime.tv_sec + (1000000 * nowtime.tv_usec);
-	if (now - then > 500000) {
+	now = nowtime.tv_sec;
+	if (now - then >= 1) {
 		return;
 	}
 

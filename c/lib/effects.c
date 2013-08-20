@@ -27,22 +27,22 @@ int effects_init () {
 void effects_fade_slow (uint32_t start_color,
                         uint32_t end_color,
                         uint16_t num_lights) {
-	effects_fade(start_color, end_color, num_lights, &fade_time_slow);
+	effects_fade(start_color, end_color, num_lights, 100, &fade_time_slow);
 }
 
 void effects_fade_fast (uint32_t start_color,
                         uint32_t end_color,
                         uint16_t num_lights) {
-	effects_fade(start_color, end_color, num_lights, &fade_time_fast);
+	effects_fade(start_color, end_color, num_lights, 10, &fade_time_fast);
 }
 
 void effects_fade (uint32_t start_color,
                    uint32_t end_color,
                    uint16_t num_lights,
+                   uint8_t num_steps,
                    struct timespec* delay) {
 	uint32_t* l;
 	uint32_t color;
-	uint8_t num_steps = 100;
 	uint16_t i, j;
 
 	l = malloc(sizeof(uint32_t) * num_lights);
