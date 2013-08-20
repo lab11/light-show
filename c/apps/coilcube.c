@@ -39,8 +39,11 @@ void coilcube_timeslot (uint32_t* lights, int len) {
 	now = thentime.tv_sec;
 
 	if (now - then >= 1) {
+		int i;
 		// If it is the start of our turn turn the lights off
-		lights_off(len);
+		for (i=0; i<len; i++) {
+			lights[i] = LIGHTS_BLACK;
+		}
 	}
 
 	then = now;

@@ -141,11 +141,11 @@ int main () {
 			for (i=1; i<number_of_apps; i++) {
 				if (info[(current_app+i) % number_of_apps].type == CONTINUOUS_APP) {
 					current_app = (current_app+i) % number_of_apps;
-
 					break;
 				}
 			}
 			app_periods = info[current_app].app_periods;
+			info[current_app].updater(lights, STRIP_LENGTH);
 		}
 
 		if (current_app == -1) {
