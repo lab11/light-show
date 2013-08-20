@@ -86,9 +86,17 @@ int register_continuous (struct timeval tv, update_fn* u) {
 	return 0;
 }
 
+// Get the time now rounded down the nearest second
+time_t seconds_now () {
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	return t.tv_sec;
+}
+
 int main () {
 	int result;
 	int i;
+	time_t start=0, now=0;
 
 	// Id of the continuous app that currently has access to the strand
 	int current_app = -1;
@@ -133,10 +141,15 @@ int main () {
 		}
 	}
 
+	start = seconds_now();
+
 	while (1) {
 		int ret;
 
-		if (app_periods == 0 && current_app != -1) {
+		now = seconds_now();
+
+		if ((app_periods == 0 || (start - now > APP_DURATION)) &&
+			current_app != -1) {
 			// Need to move to the next application
 			for (i=1; i<number_of_apps; i++) {
 				if (info[(current_app+i) % number_of_apps].type == CONTINUOUS_APP) {
@@ -146,6 +159,7 @@ int main () {
 			}
 			app_periods = info[current_app].app_periods;
 			info[current_app].updater(lights, STRIP_LENGTH);
+			start = now;
 		}
 
 		if (current_app == -1) {
