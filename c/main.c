@@ -98,7 +98,7 @@ int main () {
 	int app_periods = 0;
 
 	struct timeval* select_timeout_ptr;
-	struct timeval select_timeout;
+	struct timeval select_timeout = {0, 0};
 	int max_socket;
 	fd_set rfds;
 
@@ -152,8 +152,12 @@ int main () {
 			// no timeout
 			select_timeout_ptr = NULL;
 		} else {
-			select_timeout = info[current_app].period;
-			select_timeout_ptr = &select_timeout;
+			// If we successfully timed out last time then reset the time.
+			// Otherwise, use the existing select_timeout
+			if (select_timeout.tv_sec == 0 && select_timeout.tv_usec == 0) {
+				select_timeout = info[current_app].period;
+				select_timeout_ptr = &select_timeout;
+			}
 		}
 
 		// Setup the select call
