@@ -50,11 +50,11 @@ void door_rfid_update (uint32_t* lights, int len) {
 
 	if (strcmp(str, "udp") == 0) {
 		// remote unlock
-		effects_fade(LIGHTS_PURPLE, LIGHTS_WHITE, len);
+		effects_fade_slow(LIGHTS_PURPLE, LIGHTS_WHITE, len);
 
 	} else if (strcmp(str, "udp_failed") == 0) {
 		// remove unlock with wrong password
-		effects_fade(LIGHTS_RED, LIGHTS_WHITE, len);
+		effects_fade_slow(LIGHTS_RED, LIGHTS_WHITE, len);
 
 	} else if (strcmp(str, "rfid") == 0) {
 		// someone swiped
@@ -79,6 +79,6 @@ void door_rfid_update (uint32_t* lights, int len) {
 
 	} else if (strcmp(str, "rfid_invalid") == 0) {
 		// invalid rfid card
-		effects_fade(LIGHTS_RED, LIGHTS_WHITE, len);
+		effects_fade_slow(LIGHTS_RED, LIGHTS_WHITE, len);
 	}
 }

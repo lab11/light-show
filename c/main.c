@@ -12,17 +12,21 @@
 #include "effects.h"
 #include "app.h"
 
-#define NUMBER_APPS (sizeof(init_fns) / sizeof(init_fn*))
+#define MAX_APPS 100
 #define APP_DURATION 60  // time in seconds
+#define NUMBER_INITS (sizeof(init_fns) / sizeof(init_fn*))
 
-init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init, cube_init};
-const char* init_names[] = {"tracer", "door rfid", "random", "cube"};
-app_info    info[NUMBER_APPS] = {{CONTINUOUS_APP,
-                                  -1,
-                                  NULL,
-                                  {0, 0},
-                                  0}};
+init_fn*    init_fns[]   = {tracer_init, door_rfid_init, random_init, cube_init,
+                            coilcube_init};
+const char* init_names[] = {"tracer", "door rfid", "random", "cube",
+                            "coilcube"};
+app_info    info[MAX_APPS] = {{CONTINUOUS_APP,
+                              -1,
+                              NULL,
+                              {0, 0},
+                              0}};
 
+int number_of_apps = 0;
 
 #define STRIP_LENGTH 350
 uint32_t lights[STRIP_LENGTH];
@@ -42,12 +46,14 @@ int register_socket (int s, update_fn* u) {
 
 	// Since the app called this function, we know some of the values for the
 	// app info right off the bat.
-	info[current_initer].type = ASYNCHRONOUS_APP;
-	info[current_initer].socket = s;
-	info[current_initer].updater = u;
-	info[current_initer].period.tv_sec = 0;
-	info[current_initer].period.tv_usec = 0;
-	info[current_initer].app_periods = 0;
+	info[number_of_apps].type = ASYNCHRONOUS_APP;
+	info[number_of_apps].socket = s;
+	info[number_of_apps].updater = u;
+	info[number_of_apps].period.tv_sec = 0;
+	info[number_of_apps].period.tv_usec = 0;
+	info[number_of_apps].app_periods = 0;
+
+	number_of_apps++;
 
 	return 0;
 }
@@ -62,15 +68,17 @@ int register_continuous (struct timeval tv, update_fn* u) {
 	}
 
 	// Clear any async settings and setup the continuous app
-	info[current_initer].type = CONTINUOUS_APP;
-	info[current_initer].socket = -1;
-	info[current_initer].updater = u;
-	info[current_initer].period = tv;
+	info[number_of_apps].type = CONTINUOUS_APP;
+	info[number_of_apps].socket = -1;
+	info[number_of_apps].updater = u;
+	info[number_of_apps].period = tv;
 
 	// Determine the number of times we should call this app's update function
 	// before moving to the next app.
-	info[current_initer].app_periods = (APP_DURATION*1000000) /
+	info[number_of_apps].app_periods = (APP_DURATION*1000000) /
 	                                   (tv.tv_sec*1000000 + tv.tv_usec);
+
+	number_of_apps++;
 
 	return 0;
 }
@@ -101,7 +109,7 @@ int main (int argc, char** argv) {
 	lights_set(lights, STRIP_LENGTH);
 
 	// Run all of the init functions
-	for (i=0; i<NUMBER_APPS; i++) {
+	for (i=0; i<NUMBER_INITS; i++) {
 		current_initer = i;
 
 		result = init_fns[i]();
@@ -115,7 +123,7 @@ int main (int argc, char** argv) {
 
 	// Find a valid starting app.
 	// If one is not found then current_app will be -1 and that's ok.
-	for (i=0; i<NUMBER_APPS; i++) {
+	for (i=0; i<number_of_apps; i++) {
 		if (info[i].type == CONTINUOUS_APP) {
 			current_app = i;
 			break;
@@ -127,9 +135,9 @@ int main (int argc, char** argv) {
 
 		if (app_periods == 0 && current_app != -1) {
 			// Need to move to the next application
-			for (i=1; i<NUMBER_APPS; i++) {
-				if (info[(current_app+i) % NUMBER_APPS].type == CONTINUOUS_APP) {
-					current_app = (current_app+i) % NUMBER_APPS;
+			for (i=1; i<number_of_apps; i++) {
+				if (info[(current_app+i) % number_of_apps].type == CONTINUOUS_APP) {
+					current_app = (current_app+i) % number_of_apps;
 
 					break;
 				}
@@ -148,7 +156,7 @@ int main (int argc, char** argv) {
 		// Setup the select call
 		FD_ZERO(&rfds);
 		max_socket = 0;
-		for (i=0; i<NUMBER_APPS; i++) {
+		for (i=0; i<number_of_apps; i++) {
 			if (info[i].type == ASYNCHRONOUS_APP) {
 				FD_SET(info[i].socket, &rfds);
 				if (info[i].socket > max_socket) {
@@ -171,7 +179,7 @@ int main (int argc, char** argv) {
 
 		} else {
 			// File drescriptor ready
-			for (i=0; i<NUMBER_APPS; i++) {
+			for (i=0; i<number_of_apps; i++) {
 				if (info[i].type == ASYNCHRONOUS_APP) {
 					if (FD_ISSET(info[i].socket, &rfds)) {
 						info[i].updater(lights, STRIP_LENGTH);

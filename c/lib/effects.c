@@ -12,7 +12,8 @@
 #define GETBLUE(x) (x&0xFF)
 #define MAKECOLOR(r,g,b) (((r&0xFF)<<16)|((g&0xFF)<<8)|(b&0xFF))
 
-struct timespec fade_time = {0, 100000000};
+struct timespec fade_time_slow = {0, 100000000};
+struct timespec fade_time_fast = {0, 1000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
 struct timespec pong_time = {0, 1000000};
@@ -23,7 +24,22 @@ int effects_init () {
 	return 0;
 }
 
-void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights) {
+void effects_fade_slow (uint32_t start_color,
+                        uint32_t end_color,
+                        uint16_t num_lights) {
+	effects_fade(start_color, end_color, num_lights, &fade_time_slow);
+}
+
+void effects_fade_fast (uint32_t start_color,
+                        uint32_t end_color,
+                        uint16_t num_lights) {
+	effects_fade(start_color, end_color, num_lights, &fade_time_fast);
+}
+
+void effects_fade (uint32_t start_color,
+                   uint32_t end_color,
+                   uint16_t num_lights,
+                   struct timespec* delay) {
 	uint32_t* l;
 	uint32_t color;
 	uint8_t num_steps = 100;
@@ -39,7 +55,7 @@ void effects_fade (uint32_t start_color, uint32_t end_color, uint16_t num_lights
 		}
 
 		lights_set(l, num_lights);
-		nanosleep(&fade_time, NULL);
+		nanosleep(delay, NULL);
 	}
 
 	free(l);

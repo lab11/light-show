@@ -100,6 +100,20 @@ void lights_set (uint32_t* colors, uint16_t length) {
 #endif
 }
 
+void lights_off (uint16_t length) {
+	uint32_t* l;
+	uint16_t i;
+
+	l = malloc(length * sizeof(uint32_t));
+
+	for (i=0; i<length; i++) {
+		l[i] = LIGHTS_BLACK;
+	}
+	lights_set(l, length);
+
+	free(l);
+}
+
 int lights_init () {
 #ifndef DEBUG
 	int err;

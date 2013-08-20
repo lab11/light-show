@@ -25,6 +25,7 @@
 //Takes the current strip color array and pushes it out
 void lights_set (uint32_t* colors, uint16_t length);
 
+void lights_off (uint16_t length);
 int lights_init ();
 
 #endif

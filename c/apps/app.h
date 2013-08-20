@@ -13,4 +13,8 @@ void random_update (uint32_t* lights, int len);
 int cube_init ();
 void cube_update (uint32_t* lights, int len);
 
+int coilcube_init ();
+void coilcube_timeslot (uint32_t* lights, int len);
+void coilcube_pkt (uint32_t* lights, int len);
+
 #endif
