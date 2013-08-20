@@ -151,7 +151,7 @@ int main () {
 
 		now = seconds_now();
 
-		if ((app_periods == 0 || (start - now > APP_DURATION)) &&
+		if ((app_periods == 0 || (now - start >= APP_DURATION)) &&
 			current_app != -1) {
 			// Need to move to the next application
 			for (i=1; i<number_of_apps; i++) {
@@ -164,6 +164,7 @@ int main () {
 				init_names[info[current_app].init_id]);
 			app_periods = info[current_app].app_periods;
 			info[current_app].updater(lights, STRIP_LENGTH);
+			lights_set(lights, STRIP_LENGTH);
 			start = now;
 		}
 
