@@ -16,6 +16,7 @@ typedef enum {
 
 typedef struct {
 	app_type_e type;
+	int init_id;
 	int socket;
 	update_fn* updater;
 	struct timeval period;

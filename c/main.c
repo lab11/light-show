@@ -25,6 +25,7 @@ const char* init_names[] = {"tracer", "door rfid", "random", "cube",
                             "coilcube"};
 app_info    info[MAX_APPS] = {{CONTINUOUS_APP,
                               -1,
+                              -1,
                               NULL,
                               {0, 0},
                               0}};
@@ -50,6 +51,7 @@ int register_socket (int s, update_fn* u) {
 	// Since the app called this function, we know some of the values for the
 	// app info right off the bat.
 	info[number_of_apps].type = ASYNCHRONOUS_APP;
+	info[number_of_apps].init_id = current_initer;
 	info[number_of_apps].socket = s;
 	info[number_of_apps].updater = u;
 	info[number_of_apps].period.tv_sec = 0;
@@ -72,6 +74,7 @@ int register_continuous (struct timeval tv, update_fn* u) {
 
 	// Clear any async settings and setup the continuous app
 	info[number_of_apps].type = CONTINUOUS_APP;
+	info[number_of_apps].init_id = current_initer;
 	info[number_of_apps].socket = -1;
 	info[number_of_apps].updater = u;
 	info[number_of_apps].period = tv;
@@ -157,6 +160,8 @@ int main () {
 					break;
 				}
 			}
+			printf("[%i] Starting application: %s\n", (int) now,
+				init_names[info[current_app].init_id]);
 			app_periods = info[current_app].app_periods;
 			info[current_app].updater(lights, STRIP_LENGTH);
 			start = now;
