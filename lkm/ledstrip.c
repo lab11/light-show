@@ -134,9 +134,9 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 			for (bit=8; bit>0; bit--) {
 				gpio_set_value(LEDSTRIP_CLOCK, ZERO);
 				gpio_set_value(LEDSTRIP_DATA, (b[byte-1]&(1<<(bit-1))) ? ONE : ZERO);
-				udelay(5);
+				udelay(2);
 				gpio_set_value(LEDSTRIP_CLOCK, ONE);
-				udelay(5);
+				udelay(2);
 
 			}
 		}
@@ -146,13 +146,13 @@ ledstrip_write(struct file *filp, const char *in_buf, size_t len, loff_t * off)
 		len -= 3;
 		out_len += 3;
 
-		udelay(10);
+		udelay(5);
 	}
 
 	udelay(50);
 	// Pull clock low for 500us to put strip into reset/post mode
 	gpio_set_value(LEDSTRIP_CLOCK, ZERO);
-	udelay(1000);
+	udelay(600);
 	gpio_set_value(LEDSTRIP_CLOCK, ONE);
 
 	local_irq_enable();

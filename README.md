@@ -17,6 +17,8 @@ Kernel Module
 The kernel module is a simple driver for the lights that exports a character
 device interface that an application can write to.
 
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+
 C Code
 ------
 

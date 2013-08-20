@@ -4,7 +4,7 @@
 
 // Register tracer as an application
 int tracer_init () {
-	struct timeval period = {0, 200000};
+	struct timeval period = {0, 100000};
 
 	register_continuous(period, tracer_update);
 

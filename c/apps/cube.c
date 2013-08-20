@@ -4,8 +4,8 @@
 #include "app.h"
 #include "lights.h"
 
-#define TOP_LEFT 90
-#define TOP_RIGHT 275
+#define TOP_LEFT 85
+#define TOP_RIGHT 278
 
 uint32_t colors[3] = {LIGHTS_RED, LIGHTS_GREEN, LIGHTS_BLUE};
 
