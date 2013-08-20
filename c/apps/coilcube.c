@@ -1,3 +1,5 @@
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <json/json.h>
 #include <string.h>
 #include <stdio.h>
@@ -82,7 +84,7 @@ void coilcube_pkt (uint32_t* lights, int len) {
 		if (ccid) {
 			id = json_object_get_int64(ccid);
 
-			printf("got coilcube %li\n", id);
+			//printf("got coilcube %" PRIu64 "\n", id);
 
 			color = 0xFFFFFF & id;
 			effects_fade_fast(color, LIGHTS_BLACK, len);
