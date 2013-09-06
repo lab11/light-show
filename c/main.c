@@ -30,7 +30,7 @@ app_info    info[MAX_APPS] = {{CONTINUOUS_APP,
                               {0, 0},
                               0}};
 
-int number_of_apps = 0;
+unsigned number_of_apps = 0;
 
 #define STRIP_LENGTH 350
 uint32_t lights[STRIP_LENGTH];
@@ -98,7 +98,7 @@ time_t seconds_now () {
 
 int main () {
 	int result;
-	int i;
+	unsigned i;
 	time_t start=0, now=0;
 
 	// Id of the continuous app that currently has access to the strand

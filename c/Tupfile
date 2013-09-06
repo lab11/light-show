@@ -1,5 +1,5 @@
 include global.tup
 
-: main.c | <objs> |> !cc %<objs> -Iapps -ljson-c -lbcm2835 |> lightshow
+: main.c | <objs> |> !cc %<objs> -Iapps -ljson-c @(LDFLAGS) |> lightshow
 
 .gitignore

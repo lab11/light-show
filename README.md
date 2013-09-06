@@ -25,3 +25,6 @@ C Code
 The C code is a little bit of a hodgepodge of different applications that
 run the lights with different applications. tracer.c is designed to be used
 with the GATD system.
+
+Building the C code requires the json-c library from
+https://github.com/json-c/json-c.git
