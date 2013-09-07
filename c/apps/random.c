@@ -4,14 +4,6 @@
 #include "app.h"
 #include "lights.h"
 
-int random_init () {
-	struct timeval period = {0, 100000};
-
-	register_continuous(period, random_update);
-
-	return 0;
-}
-
 void random_update (uint32_t* lights, int len) {
 	int i;
 	uint32_t new_color;
@@ -29,4 +21,18 @@ void random_update (uint32_t* lights, int len) {
 	}
 
 	lights[0] = new_color; //Add the new random color to the strip
+}
+
+
+static int random_init () {
+	struct timeval period = {0, 100000};
+
+	register_continuous(period, random_update);
+
+	return 0;
+}
+
+__attribute__ ((constructor))
+static void register_random_init(void) {
+	register_init_fn(random_init, "random");
 }

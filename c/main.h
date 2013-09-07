@@ -9,6 +9,8 @@
 typedef int init_fn (void);
 typedef void update_fn (uint32_t* lights, int len);
 
+void register_init_fn(init_fn *fn, const char *name);
+
 typedef enum {
 	ASYNCHRONOUS_APP,
 	CONTINUOUS_APP

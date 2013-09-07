@@ -22,14 +22,6 @@ rfid_action_t uniqname_actions[] = {{"bradjc", bradjc_enter},
                                     {"wwhuang", wwhuang_enter},
                                     {"zakir", zakir_enter}};
 
-int door_rfid_init () {
-	stream_socket = streamer_connect(query);
-
-	register_socket(stream_socket, door_rfid_update);
-
-	return 0;
-}
-
 // Receive the data packet from the streamer and set the lights to a color
 // depending on who entered and how.
 void door_rfid_update (uint32_t* lights, int len) {
@@ -81,4 +73,18 @@ void door_rfid_update (uint32_t* lights, int len) {
 		// invalid rfid card
 		effects_fade_slow(LIGHTS_RED, LIGHTS_WHITE, len);
 	}
+}
+
+
+static int door_rfid_init () {
+	stream_socket = streamer_connect(query);
+
+	register_socket(stream_socket, door_rfid_update);
+
+	return 0;
+}
+
+__attribute__ ((constructor))
+static void register_door_rfid_init(void) {
+	register_init_fn(door_rfid_init, "door rfid");
 }

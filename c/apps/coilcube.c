@@ -21,17 +21,6 @@ char ccquery[] = "{\"profile_id\":\"7aiOPJapXF\", \"type\":\"coilcube_watts\"}";
 
 time_t then = 0;
 
-int coilcube_init () {
-	struct timeval period = {0, 100000};
-
-	cc_socket = streamer_connect(ccquery);
-
-	register_continuous(period, coilcube_timeslot);
-	register_socket(cc_socket, coilcube_pkt);
-
-	return 0;
-}
-
 // Update the colors for the simple tracer application
 void coilcube_timeslot (uint32_t* lights, int len) {
 	struct timeval thentime;
@@ -91,4 +80,21 @@ void coilcube_pkt (uint32_t* lights, int len) {
 		}
 	}
 
+}
+
+
+static int coilcube_init () {
+	struct timeval period = {0, 100000};
+
+	cc_socket = streamer_connect(ccquery);
+
+	register_continuous(period, coilcube_timeslot);
+	register_socket(cc_socket, coilcube_pkt);
+
+	return 0;
+}
+
+__attribute__ ((constructor))
+static void register_coilcube_init(void) {
+	register_init_fn(coilcube_init, "coilcube");
 }

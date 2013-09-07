@@ -2,15 +2,6 @@
 #include "app.h"
 #include "lights.h"
 
-// Register tracer as an application
-int tracer_init () {
-	struct timeval period = {0, 10000};
-
-	register_continuous(period, tracer_update);
-
-	return 0;
-}
-
 // Update the colors for the simple tracer application
 void tracer_update (uint32_t* lights, int len) {
 	static int dot = 0;
@@ -38,4 +29,19 @@ void tracer_update (uint32_t* lights, int len) {
 			rising = 1;
 		}
 	}
+}
+
+
+// Register tracer as an application
+static int tracer_init () {
+	struct timeval period = {0, 10000};
+
+	register_continuous(period, tracer_update);
+
+	return 0;
+}
+
+__attribute__ ((constructor))
+static void register_tracer_init(void) {
+	register_init_fn(tracer_init, "tracer");
 }

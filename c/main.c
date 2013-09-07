@@ -12,17 +12,20 @@
 #include "effects.h"
 #include "app.h"
 
-#define MAX_APPS 100
+#define MAX_APPS 64
 #define APP_DURATION 60  // time in seconds
-#define NUMBER_INITS (sizeof(init_fns) / sizeof(init_fn*))
 
-init_fn*    init_fns[]   = {tracer_init,
-                            door_rfid_init,
-                            random_init,
-                            cube_init,
-                            coilcube_init};
-const char* init_names[] = {"tracer", "door rfid", "random", "cube",
-                            "coilcube"};
+static unsigned number_inits = 0;
+static init_fn *init_fns[MAX_APPS];
+static const char *init_names[MAX_APPS];
+
+void register_init_fn(init_fn* fn, const char *name) {
+	init_fns[number_inits] = fn;
+	init_names[number_inits] = name;
+
+	number_inits++;
+}
+
 app_info    info[MAX_APPS] = {{CONTINUOUS_APP,
                               -1,
                               -1,
@@ -123,7 +126,7 @@ int main () {
 	lights_set(lights, STRIP_LENGTH);
 
 	// Run all of the init functions
-	for (i=0; i<NUMBER_INITS; i++) {
+	for (i=0; i<number_inits; i++) {
 		current_initer = i;
 
 		result = init_fns[i]();

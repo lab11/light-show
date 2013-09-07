@@ -11,14 +11,6 @@ uint32_t colors[3] = {LIGHTS_RED, LIGHTS_GREEN, LIGHTS_BLUE};
 
 uint8_t orientation = 0;
 
-int cube_init () {
-	struct timeval period = {10, 0};
-
-	register_continuous(period, cube_update);
-
-	return 0;
-}
-
 void cube_update (uint32_t* lights, int len) {
 	int i;
 
@@ -35,4 +27,17 @@ void cube_update (uint32_t* lights, int len) {
 	}
 
 	orientation = (orientation+1) % 3;
+}
+
+static int cube_init () {
+	struct timeval period = {10, 0};
+
+	register_continuous(period, cube_update);
+
+	return 0;
+}
+
+__attribute__ ((constructor))
+static void register_cube_init(void) {
+	register_init_fn(cube_init, "cube");
 }
