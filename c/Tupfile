@@ -1,5 +1,6 @@
 include global.tup
 
-: main.c | <objs> |> !cc %<objs> -Iapps -ljson-c @(LDFLAGS) |> lightshow
+export PKG_CONFIG_PATH
+: main.c | <objs> |> !cc %<objs> -Iapps `pkg-config --libs json-c` -Wl,-rpath -Wl,/usr/local/lib @(LDFLAGS) |> lightshow
 
 .gitignore
