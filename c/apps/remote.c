@@ -15,7 +15,7 @@
 
 static int server_socket;
 
-void remote_control (uint32_t* lights, int len) {
+static void remote_control (uint32_t* lights, int len) {
 	int client;
 
 	client = accept(server_socket, NULL, NULL);
@@ -55,13 +55,30 @@ void remote_control (uint32_t* lights, int len) {
 
 	time_t start_time = time(NULL);
 	const int net_len = len * sizeof(uint32_t);
+	char command;
 	while (time(NULL) - start_time < REMOTE_LIMIT_IN_SECONDS) {
-		if (recv(client, lights, net_len, MSG_WAITALL) != net_len) {
-			perror("\nrecv lights");
+		if (recv(client, &command, 1, MSG_WAITALL) != 1) {
+			perror("\nrecv lights command");
 			goto remote_die;
 		}
 
-		lights_set(lights, len);
+		switch (command) {
+			case 'a': // Write (a)ll lights
+				if (recv(client, lights, net_len, MSG_WAITALL) != net_len) {
+					perror("\nrecv lights");
+					goto remote_die;
+				}
+
+				lights_set(lights, len);
+				break;
+
+			case 'k': // (k)eep alive
+				break;
+
+			default:
+				fprintf(stderr, "\nBad command character: %c (%02x)\n", command, command);
+				goto remote_die;
+		}
 	}
 
 remote_die:
