@@ -7,11 +7,6 @@
 #include "lights.h"
 #include "effects.h"
 
-#define GETRED(x) ((x>>16)&0xFF)
-#define GETGREEN(x) ((x>>8)&0xFF)
-#define GETBLUE(x) (x&0xFF)
-#define MAKECOLOR(r,g,b) (((r&0xFF)<<16)|((g&0xFF)<<8)|(b&0xFF))
-
 struct timespec fade_time = {0, 100000000};
 struct timespec blink_time = {0, 100000000};
 struct timespec grow_time = {1, 0};
