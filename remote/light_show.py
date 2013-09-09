@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+import sys
 import socket
 import struct
 from time import sleep
 import threading
+
+DEFAULT_HOST = 'localhost'
+DEFAULT_PORT = 4908
 
 class LightsConnection(object):
     BLUE  = 0xff000000
@@ -79,12 +83,18 @@ class LightsConnectionWithKeepalives(LightsConnection):
                 return
 
 if __name__ == '__main__':
-    l = LightsConnection()
+    try:
+        DEFAULT_HOST = sys.argv[1]
+        DEFAULT_PORT = sys.argv[2]
+    except IndexError:
+        pass
+    l = LightsConnectionWithKeepalives((DEFAULT_HOST, DEFAULT_PORT))
     print l.number_of_lights
     print "All off..."
     l.write_all_lights((0,)*l.number_of_lights)
-    sleep(1)
+    sleep(3)
     print "All on..."
-    l.write_all_lights((0x00ffffff,)*l.number_of_lights)
-    sleep(1)
+    l.write_all_lights((0xffffff00,)*l.number_of_lights)
+    sleep(3)
+    l.disconnect()
     print "Done"

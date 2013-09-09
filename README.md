@@ -28,3 +28,15 @@ with the GATD system.
 
 Building the C code requires the json-c library from
 https://github.com/json-c/json-c.git
+
+Remote Access
+-------------
+
+The app 'remote' in `c/apps/remote.c` provides network-controllable access for
+the lights. Control of the strand is retained by the remote application for up
+to 60 seconds, you may give up your quanta earlier by closing the connection. To
+ensure responsiveness, a remote application must send a message every 3 seconds
+or it will be dropped.
+
+`remote/light_show.py` provides a basic python class and example for controlling
+the lights over the remote interface.

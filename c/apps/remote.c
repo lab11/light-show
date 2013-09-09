@@ -12,6 +12,7 @@
 #include "lights.h"
 
 #define REMOTE_LIMIT_IN_SECONDS 60
+#define INACTIVITY_TIMEOUT_IN_SECONDS 3
 
 static int server_socket;
 
@@ -25,7 +26,7 @@ static void remote_control (uint32_t* lights, int len) {
 	}
 
 	struct timeval tv;
-	tv.tv_sec = 5;
+	tv.tv_sec = INACTIVITY_TIMEOUT_IN_SECONDS;
 	tv.tv_usec = 0;
 	if (setsockopt(client, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval)) != 0) {
 		perror("\nsetsockopt client TO");
