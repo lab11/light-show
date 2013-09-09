@@ -19,6 +19,7 @@ char query[] = "{\"profile_id\":\"U8H29zqH0i\"}";
 #define NUMBER_PEOPLE sizeof(uniqname_actions) / sizeof(rfid_action_t)
 rfid_action_t uniqname_actions[] = {{"bradjc", bradjc_enter},
                                     {"nklugman", nklugman_enter},
+                                    {"ppannuto", ppannuto_enter},
                                     {"wwhuang", wwhuang_enter},
                                     {"zakir", zakir_enter}};
 
