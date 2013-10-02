@@ -147,6 +147,7 @@ int main () {
 		}
 	}
 
+	bool changed_apps = false;
 	start = seconds_now();
 
 	while (1) {
@@ -157,6 +158,7 @@ int main () {
 		if ((app_periods == 0 || (now - start >= APP_DURATION)) &&
 			current_app != -1) {
 			// Need to move to the next application
+			changed_apps = true;
 			for (i=1; i<number_of_apps; i++) {
 				if (info[(current_app+i) % number_of_apps].type == CONTINUOUS_APP) {
 					current_app = (current_app+i) % number_of_apps;
@@ -194,7 +196,17 @@ int main () {
 				}
 			}
 		}
-		ret = select(max_socket+1, &rfds, NULL, NULL, select_timeout_ptr);
+
+		// When an app finishes, if it returns to an app with a long timeout,
+		// that timeout will have to expire before the sync app runs for a loop.
+		// This makes apps like "cube" look silly. Fix this by skipping the timeout
+		// for the first call of a new app.
+		if (changed_apps && (current_app != -1)) {
+			changed_apps = false;
+			ret = 0;
+		} else {
+			ret = select(max_socket+1, &rfds, NULL, NULL, select_timeout_ptr);
+		}
 
 		if (ret == -1) {
 			// An error occurred with select
@@ -216,6 +228,7 @@ int main () {
 					}
 				}
 			}
+			changed_apps = true;
 		}
 
 	}
