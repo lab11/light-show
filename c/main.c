@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -168,8 +169,6 @@ int main () {
 			printf("[%i] Starting application: %s\n", (int) now,
 				init_names[info[current_app].init_id]);
 			app_periods = info[current_app].app_periods;
-			info[current_app].updater(lights, STRIP_LENGTH);
-			lights_set(lights, STRIP_LENGTH);
 			start = now;
 		}
 
