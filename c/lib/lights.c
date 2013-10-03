@@ -8,10 +8,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifndef DEBUG
-#include <bcm2835.h>
-#endif
-
 #include "lights.h"
 
 struct timespec reset_time = {0, 500000};
@@ -27,40 +23,6 @@ void lights_set (uint32_t* colors, uint16_t length) {
 	//bits to its neighbor
 	//Pulling the clock low for 500us or more causes the IC to post the data.
 #ifndef DEBUG
-/*	int led;
-	uint32_t color;
-	//uint8_t color_bit;
-	uint8_t color_byte;
-	uint32_t mask;
-
-	for (led=0; led<length; led++) {
-		color = colors[led]; //24 bits of color data
-
-		for (color_bit=0; color_bit<24; color_bit++) {
-			bcm2835_gpio_clr(CLOCK); //Only change data when clock is low
-
-			mask = 1L << color_bit;
-
-			if (color & mask) {
-				bcm2835_gpio_set(DATA);
-			} else {
-				bcm2835_gpio_clr(DATA);
-			}
-
-			bcm2835_gpio_set(CLOCK);
-		}
-
-		for (color_byte=0; color_byte<3; color_byte++) {
-			uint8_t cb = (color >> (color_byte*8)) & 0xFF;
-			bcm2835_spi_transfer(cb);
-		}
-	}
-
-	//Pull clock low to put strip into reset/post mode
-	bcm2835_gpio_clr(CLOCK);
-	nanosleep(&reset_time, NULL);
-*/
-
 	ssize_t result;
 	int i;
 	uint8_t* outbuf;
@@ -120,22 +82,6 @@ void lights_off (uint16_t length) {
 int lights_init () {
 #ifndef DEBUG
 	int err;
-
-	// Init the GPIO library
-	err = bcm2835_init();
-	if (err == 0) {
-		printf("Failed to initialize the bcm gpio.\n");
-		return 1;
-	}
-
-	// Init the relevant GPIO pins
-	bcm2835_gpio_fsel(LED0, BCM2835_GPIO_FSEL_OUTP);
-	bcm2835_gpio_fsel(LED1, BCM2835_GPIO_FSEL_OUTP);
-	bcm2835_gpio_fsel(LED2, BCM2835_GPIO_FSEL_OUTP);
-
-	bcm2835_gpio_clr(LED0);
-	bcm2835_gpio_clr(LED1);
-	bcm2835_gpio_clr(LED2);
 
 	ledstrip_file = open(LEDSTRIP_FILENAME, O_WRONLY, NULL);
 	if (ledstrip_file == -1) {
