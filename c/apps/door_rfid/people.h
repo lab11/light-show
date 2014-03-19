@@ -6,5 +6,6 @@ void nklugman_enter (int len);
 void ppannuto_enter (int len);
 void wwhuang_enter (int len);
 void zakir_enter (int len);
+void mclarkk_enter (int len);
 
 #endif
