@@ -1,1 +1,5 @@
+ifndef GCC
+error No compiler defined
+endif
+
 !cc = |> @(GCC) %f -Wall -Wextra -I/usr/local/include -Ilib @(LDFLAGS) @(CFLAGS) -o %o |>
