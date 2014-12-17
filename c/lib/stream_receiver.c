@@ -10,7 +10,7 @@
 
 #include <json/json.h>
 
-#define HOST "inductor.eecs.umich.edu"
+#define HOST "gatd.eecs.umich.edu"
 #define PORT "22500"
 
 #define INBUF_SIZE 16384
